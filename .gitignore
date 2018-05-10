@@ -1,1 +1,4 @@
 .idea/
+__pycache__/
+train_and_save/vehicles_smallset
+train_and_save/non-vehicles_smallset
