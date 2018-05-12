@@ -2,3 +2,9 @@
 __pycache__/
 train_and_save/vehicles_smallset
 train_and_save/non-vehicles_smallset
+output_images/
+output_images_test_video/
+test_videos_output/
+non-vehicles_smallset/
+vehicles_smallset/
+test_videos/
