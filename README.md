@@ -120,7 +120,7 @@ Or click on the YouTube video below:
 
 [![Project video output](https://img.youtube.com/vi/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=qT1a65P5MH4)
 
-#### 2. Remove false positives
+#### Remove false positives
 
 I did the following to remove false positives from the video:
 - Thresholding the heatmap: remove pixel below a certain count (5)
