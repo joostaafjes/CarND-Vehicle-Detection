@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import time
 from skimage.feature import hog
-from lesson_functions import *
+from functions import *
 import matplotlib.pyplot as plt
 from scipy.ndimage.measurements import label
 
@@ -13,7 +13,7 @@ class FindCar:
                    hist_range=(0, 256), orient=9,
                    pix_per_cell=8, cell_per_block=2,
                    hog_channel=0, spatial_feat=True,
-                   hist_feat=True, hog_feat=True):
+                   hist_feat=True, hog_feat=True, min_car_history=1):
         self.clf = clf
         self.scaler = scaler
         self.color_space = color_space
@@ -31,13 +31,15 @@ class FindCar:
         self.count = 0
 
         self.heat_history = []
+        self.min_car_history = min_car_history
+        self.cnt = 0
 
     # Define a function that takes an image,
     # start and stop positions in both x and y,
     # window size (x and y dimensions),
     # and overlap fraction (for both x and y)
     def slide_windows(self, img, x_start_stop=[None, None], y_start_stop=[None, None],
-                     xy_window=(64, 64), xy_overlap=(0.5, 0.5)):
+                     xy_window=(64, 64), xy_overlap=(0.75, 0.75)):
         # If x and/or y start/stop positions not defined, set to image size
         if x_start_stop[0] == None:
             x_start_stop[0] = 0
@@ -108,6 +110,11 @@ class FindCar:
             # 7) If positive (prediction == 1) then save the window
             if prediction == 1:
                 on_windows.append(window)
+                # mpimg.imsave('{}{:04d}_extra.jpeg'.format('./stills/', self.cnt), test_img)
+                # self.cnt+=1
+            # else:
+            #     mpimg.imsave('{}{:04d}_car.jpeg'.format('./stills/', self.cnt), test_img)
+            #     self.cnt+=1
         print('- ', round(time.time() - starttime, 2), 'Seconds to extract HOG features...')
         # 8) Return windows for positive detections
         return on_windows, self.window_list
@@ -150,11 +157,11 @@ class FindCar:
             if hog_channel == 'ALL':
                 hog_features = []
                 for channel in range(feature_image.shape[2]):
-                    hog_features.extend(self.get_hog_features(feature_image[:, :, channel],
+                    hog_features.extend(get_hog_features(feature_image[:, :, channel],
                                                          orient, pix_per_cell, cell_per_block,
                                                          vis=False, feature_vec=True))
             else:
-                hog_features = self.get_hog_features(feature_image[:, :, hog_channel], orient,
+                hog_features = get_hog_features(feature_image[:, :, hog_channel], orient,
                                                 pix_per_cell, cell_per_block, vis=False, feature_vec=True)
             # 8) Append features to list
             img_features.append(hog_features)
@@ -170,58 +177,19 @@ class FindCar:
         if conv == 'RGB2LUV':
             return cv2.cvtColor(img, cv2.COLOR_RGB2LUV)
 
-    # Define a function to return HOG features and visualization
-    def get_hog_features(self, img, orient, pix_per_cell, cell_per_block,
-                         vis=False, feature_vec=True):
-        # Call with two outputs if vis==True
-        if vis == True:
-            features, hog_image = hog(img, orientations=orient,
-                                      pixels_per_cell=(pix_per_cell, pix_per_cell),
-                                      block_norm='L2-Hys',
-                                      cells_per_block=(cell_per_block, cell_per_block),
-                                      transform_sqrt=True,
-                                      visualise=vis, feature_vector=feature_vec)
-            return features, hog_image
-        # Otherwise call with one output
-        else:
-            features = hog(img, orientations=orient,
-                           pixels_per_cell=(pix_per_cell, pix_per_cell),
-                           cells_per_block=(cell_per_block, cell_per_block),
-                           block_norm='L2-Hys',
-                           transform_sqrt=True,
-                           visualise=vis, feature_vector=feature_vec)
-            return features
 
-
-    # Define a function to compute binned color features
-    def bin_spatial(self, img, size=(32, 32)):
-        # Use cv2.resize().ravel() to create the feature vector
-        features = cv2.resize(img, size).ravel()
-        # Return the feature vector
-        return features
-
-
-    # Define a function to compute color histogram features
-    # NEED TO CHANGE bins_range if reading .png files with mpimg!
-    def color_hist(self, img, nbins=32, bins_range=(0, 256)):
-        # Compute the histogram of the color channels separately
-        channel1_hist = np.histogram(img[:, :, 0], bins=nbins, range=bins_range)
-        channel2_hist = np.histogram(img[:, :, 1], bins=nbins, range=bins_range)
-        channel3_hist = np.histogram(img[:, :, 2], bins=nbins, range=bins_range)
-        # Concatenate the histograms into a single feature vector
-        hist_features = np.concatenate((channel1_hist[0], channel2_hist[0], channel3_hist[0]))
-        # Return the individual histograms, bin_centers and feature vector
-        return hist_features
 
     def search_cars(self, image, plot=False, write=False, heat_threshold=1, heat_history_max=1,  base_dir='./output_images/'):
         self.count += 1
         draw_image = np.copy(image)
+        if write:
+            mpimg.imsave('{}{}_step0.jpg'.format(base_dir, self.count), draw_image)
 
         # 64x64
         hot_windows_1, all_windows = self.slide_windows_and_search_cars(image,
                                                                             x_start_stop=[None, None],
-                                                                            y_start_stop=[400, 720],
-                                                                            xy_window=(64, 64), xy_overlap=(0.5, 0.5))
+                                                                            y_start_stop=[400, 650],
+                                                                            xy_window=(64, 64), xy_overlap=(0.75, 0.75))
         self.window_img_1 = draw_boxes(draw_image, hot_windows_1, color=(0, 255, 0), thick=6)
         if plot:
             plt.imshow(self.window_img_1)
@@ -232,8 +200,8 @@ class FindCar:
         # 96x96
         hot_windows_2, all_windows = self.slide_windows_and_search_cars(image,
                                                                             x_start_stop=[None, None],
-                                                                            y_start_stop=[400, 720],
-                                                                            xy_window=(96, 96), xy_overlap=(0.5, 0.5))
+                                                                            y_start_stop=[400, 650],
+                                                                            xy_window=(96, 96), xy_overlap=(0.75, 0.75))
         self.window_img_2 = draw_boxes(draw_image, hot_windows_2, color=(0, 0, 255), thick=6)
         if plot:
             plt.imshow(self.window_img_2)
@@ -244,8 +212,8 @@ class FindCar:
         # 128x128
         hot_windows_3, all_windows = self.slide_windows_and_search_cars(image,
                                                                             x_start_stop=[None, None],
-                                                                            y_start_stop=[400, 720],
-                                                                            xy_window=(128, 128), xy_overlap=(0.5, 0.5))
+                                                                            y_start_stop=[400, 650],
+                                                                            xy_window=(128, 128), xy_overlap=(0.75, 0.75))
         self.window_img_3 = draw_boxes(draw_image, hot_windows_3, color=(255, 0, 0), thick=6)
         if plot:
             plt.imshow(self.window_img_3)
@@ -277,7 +245,11 @@ class FindCar:
         labels = label(self.heatmap)
         self.cars_found = labels[1]
 
-        draw_img = draw_labeled_bboxes(np.copy(image), labels)
+        # wait till some history is available
+        if len(self.heat_history) < self.min_car_history:
+            draw_img = np.copy(image)
+        else:
+            draw_img = draw_labeled_bboxes(np.copy(image), labels)
 
         mpimg.imsave('{}{}-step5_carpos.jpg'.format(base_dir, self.count), draw_img)
         mpimg.imsave('{}{}-step4_heatmap.jpg'.format(base_dir, self.count), self.heatmap_as_normal_img)

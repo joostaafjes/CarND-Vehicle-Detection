@@ -2,15 +2,18 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
+import os
 import glob
 import time
-from sklearn.svm import LinearSVC
+from sklearn.svm import SVC, LinearSVC
+from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from skimage.feature import hog
-from lesson_functions import *
+from functions import *
 from sklearn.model_selection import train_test_split
 import pickle
 
+from find_car_fast import FindCar
 
 # Define a function to extract features from a single image window
 # This function is very similar to extract_features()
@@ -96,7 +99,7 @@ def search_windows(img, windows, clf, scaler, color_space='RGB',
 
 
 # Read in cars and notcars
-images = glob.glob('./**/*.jpeg', recursive=True)
+images = glob.glob('./*smallset/**/*.jpeg', recursive=True)
 cars = []
 notcars = []
 for image in images:
@@ -111,7 +114,6 @@ sample_size = 1500
 cars = cars[0:sample_size]
 notcars = notcars[0:sample_size]
 
-### TODO: Tweak these parameters and see how the results change.
 color_space = 'YCrCb'  # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
 orient = 8  # HOG orientations
 pix_per_cell = 8  # HOG pixels per cell
@@ -157,8 +159,16 @@ X_test = X_scaler.transform(X_test)
 print('Using:', orient, 'orientations', pix_per_cell,
       'pixels per cell and', cell_per_block, 'cells per block')
 print('Feature vector length:', len(X_train[0]))
+
 # Use a linear SVC
-svc = LinearSVC()
+# svc = LinearSVC()
+
+# Linear SVC with optimizer
+# parameters = {'kernel':('linear', 'rbf'), 'C':[0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.5, 2, 3, 4, 5, 10]}
+parameters = {'kernel':('linear', 'rbf'), 'C':[1]}
+svr = SVC()
+svc = GridSearchCV(svr, parameters)
+
 # Check the training time for the SVC
 t = time.time()
 svc.fit(X_train, y_train)
@@ -166,31 +176,110 @@ t2 = time.time()
 print(round(t2 - t, 2), 'Seconds to train SVC...')
 # Check the score of the SVC
 print('Test Accuracy of SVC = ', round(svc.score(X_test, y_test), 4))
+print('C:', svr.C)
 # Check the prediction time for a single sample
 t = time.time()
 
-image = mpimg.imread('bbox-example-image.jpg')
-draw_image = np.copy(image)
+# image = mpimg.imread('bbox-example-image.jpg')
+# draw_image = np.copy(image)
+#
+# # Uncomment the following line if you extracted training
+# # data from .png images (scaled 0 to 1 by mpimg) and the
+# # image you are searching is a .jpg (scaled 0 to 255)
+# # image = image.astype(np.float32)/255
+#
+# windows = slide_window(image, x_start_stop=[None, None], y_start_stop=y_start_stop,
+#                        xy_window=(128, 128), xy_overlap=(0.5, 0.5))
+#
+# hot_windows = search_windows(image, windows, svc, X_scaler, color_space=color_space,
+#                              spatial_size=spatial_size, hist_bins=hist_bins,
+#                              orient=orient, pix_per_cell=pix_per_cell,
+#                              cell_per_block=cell_per_block,
+#                              hog_channel=hog_channel, spatial_feat=spatial_feat,
+#                              hist_feat=hist_feat, hog_feat=hog_feat)
+#
+# window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
+#
+# plt.imshow(window_img)
+# plt.show()
 
-# Uncomment the following line if you extracted training
-# data from .png images (scaled 0 to 1 by mpimg) and the
-# image you are searching is a .jpg (scaled 0 to 255)
-# image = image.astype(np.float32)/255
 
-windows = slide_window(image, x_start_stop=[None, None], y_start_stop=y_start_stop,
-                       xy_window=(128, 128), xy_overlap=(0.5, 0.5))
+# color_space = 'YCrCb'  # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
+# hog_channel = "ALL"  # Can be 0, 1, 2, or "ALL"
+# spatial_feat = True # Spatial features on or off
+# hist_feat = True # Histogram features on or off
+# hog_feat = True  # HOG features on or off
 
-hot_windows = search_windows(image, windows, svc, X_scaler, color_space=color_space,
-                             spatial_size=spatial_size, hist_bins=hist_bins,
-                             orient=orient, pix_per_cell=pix_per_cell,
-                             cell_per_block=cell_per_block,
-                             hog_channel=hog_channel, spatial_feat=spatial_feat,
-                             hist_feat=hist_feat, hog_feat=hog_feat)
+find_car = FindCar(svc, X_scaler, color_space=color_space,
+                                   spatial_size=spatial_size, hist_bins=hist_bins,
+                                   orient=orient, pix_per_cell=pix_per_cell,
+                                   cell_per_block=cell_per_block,
+                                   hog_channel=hog_channel, spatial_feat=spatial_feat,
+                                   hist_feat=hist_feat, hog_feat=hog_feat)
 
-window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
+image_list = [
+    # 'bbox-example-image',
+    # 'test_image',
+    # 'test1',
+    # 'test2',
+    # 'test3',
+    # 'test4',
+    # 'test5',
+    # 'test6',
+    # '1_step0',
+    # '2_step0',
+    # '3_step0',
+    # '495_step0',
+    # '4_step0',
+    # '620_step0',
+    # '630_step0',
+    # 'new/499_step0',
+    # 'new/506_step0',
+    # 'new/615_step0',
+    # 'new/640_step0',
+    # 'new/656_step0',
+    # 'new/677_step0',
+    # 'new/688_step0',
+    # 'new2/373_step0',
+    # 'new2/377_step0',
+    # 'new2/380_step0',
+    # 'new2/493_step0',
+    # 'new2/497_step0',
+    # 'new2/502_step0',
+    # 'new3/619_step0',
+    # 'new3/622_step0',
+    # 'new3/626_step0',
+    # 'new3/634_step0',
+    # 'new3/654_step0',
+    # 'new3/656_step0',
+    # 'new7/1160_step0',
+    # 'new7/1170_step0',
+    'new7/1180_step0',
+]
 
-plt.imshow(window_img)
-plt.show()
+for image_filename in image_list:
+    for heat_threshold in range(1, 2):
+        starttime = time.time()
+        # img = mpimg.imread('test_image.jpg')
+        base_output_dir = './output_images_exper/ht{}/'.format(heat_threshold)
+        image = mpimg.imread('./test_images/' + image_filename + '.jpg')
+
+        if not os.path.exists(base_output_dir):
+            os.makedirs(base_output_dir)
+
+        draw_img = find_car.search_cars(image, plot=True, write=True, heat_threshold=heat_threshold, heat_history_max=1, base_dir=base_output_dir)
+
+        fig = plt.figure()
+        plt.subplot(121)
+        plt.imshow(draw_img)
+        plt.title('Car Positions ({})'.format(find_car.cars_found))
+        plt.subplot(122)
+        plt.imshow(find_car.heatmap, cmap='hot')
+        plt.title('Heat Map ' + image_filename)
+        fig.tight_layout()
+        plt.show()
+
+        print(round(time.time() - starttime, 2), 'Seconds to extract HOG features...')
 
 
 # get attributes of our svc object
