@@ -25,7 +25,7 @@ The goals / steps of this project are the following:
 
 ---
 
-[![Project video output](https://img.youtube.com/vi/https://youtu.be/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=https://youtu.be/qT1a65P5MH4)
+[![Project video output](https://img.youtube.com/vi/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=qT1a65P5MH4)
 
 ---
 ### Writeup / README
@@ -100,9 +100,9 @@ Below are some examples of the intermediate steps.
 ### The final prediction
 ![alt text][image6]
 
-Or click on the YouTube video below to see the pipeline with the intermediate step embedded:
+Or click on the YouTube video below to see the pipeline with the intermediate steps embedded:
 
-[![Project video output](https://img.youtube.com/vi/https://youtu.be/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=https://youtu.be/qT1a65P5MH4)
+[![Project video output](https://img.youtube.com/vi/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=qT1a65P5MH4)
 
 ---
 
@@ -118,7 +118,7 @@ Here's a [link to my video result](./test_video_output/project_video.mp4)
 
 Or click on the YouTube video below:
 
-[![Project video output](https://img.youtube.com/vi/https://youtu.be/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=https://youtu.be/qT1a65P5MH4)
+[![Project video output](https://img.youtube.com/vi/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=qT1a65P5MH4)
 
 #### 2. Remove false positives
 
