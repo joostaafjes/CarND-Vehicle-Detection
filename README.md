@@ -24,6 +24,10 @@ The goals / steps of this project are the following:
 [video1]: ./test_video_output/project_video.mp4
 
 ---
+
+[![Project video output](https://img.youtube.com/vi/https://youtu.be/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=https://youtu.be/qT1a65P5MH4)
+
+---
 ### Writeup / README
 
 ### Histogram of Oriented Gradients (HOG)
@@ -95,6 +99,11 @@ Below are some examples of the intermediate steps.
 
 ### The final prediction
 ![alt text][image6]
+
+Or click on the YouTube video below to see the pipeline with the intermediate step embedded:
+
+[![Project video output](https://img.youtube.com/vi/https://youtu.be/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=https://youtu.be/qT1a65P5MH4)
+
 ---
 
 ### Speed improvement
@@ -107,11 +116,16 @@ The code can be found in `find_car_fast.py`
 #### Final video
 Here's a [link to my video result](./test_video_output/project_video.mp4)
 
+Or click on the YouTube video below:
+
+[![Project video output](https://img.youtube.com/vi/https://youtu.be/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=https://youtu.be/qT1a65P5MH4)
+
 #### 2. Remove false positives
 
 I did the following to remove false positives from the video:
 - Thresholding the heatmap: remove pixel below a certain count (5)
 - Average the heatmap over a number of frames: 10
 - Adjusting the window the search for (y between 400 and 650)
+- Retrained the linear SVM with additional images that were wrongly classified
 
 
