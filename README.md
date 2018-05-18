@@ -1,6 +1,7 @@
----
 
-## Vehicle Detection Project ##
+## Vehicle Detection Project
+
+---
 
 The goals / steps of this project are the following:
 
@@ -12,6 +13,7 @@ The goals / steps of this project are the following:
 * Estimate a bounding box for vehicles detected.
 
 [//]: # (Image References)
+
 [image1a]: ./examples/car.jpeg
 [image1b]: ./examples/not_car.jpeg
 [image4]: ./examples/sliding_window.jpg
