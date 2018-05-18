@@ -16,11 +16,12 @@ The goals / steps of this project are the following:
 
 [image1a]: ./examples/car.jpeg
 [image1b]: ./examples/not_car.jpeg
-[image4]: ./examples/sliding_window.jpg
-[image5]: ./examples/bboxes_and_heat.png
-[image6]: ./examples/labels_map.png
-[image7]: ./examples/output_bboxes.png
-[video1]: ./project_video.mp4
+[image4a]: ./examples/bb1.jpg
+[image4b]: ./examples/bb2.jpg
+[image4c]: ./examples/bb3.jpg
+[image5]: ./examples/heatmap.jpg
+[image6]: ./examples/bb_final.jpg
+[video1]: ./test_video_output/project_video.mp4
 
 ---
 ### Writeup / README
@@ -68,48 +69,49 @@ The sliding window search is implemented in the `find_car.py` file/class at line
 - the `slide_windows_and_search_cars` loops through all windows and calculate the HOG features and makes predictions
 
 I have tried several combinations of y start/stop values, windows sizes and overlap and the following combinations lead a sufficient result:
-- y start-stop: 400-720
+- y start-stop: 400-650
 - windows sizes 64, 96 and 128
 - overlap of 75%
 
 #### 2. Pipeline
 
-- heatmap history
-- threshold
+The pipeline exists of the following steps:
+- Loop with window size 64x64 through the image and predict per window if car or not
+- Same for 96x96 windows and 128x128 windows
+- Make a heatmap where for the sum of all previous predictions
+- Threshold the heatmap: all values below a certain value (I have used 5 as the threshold) are set to 0 
+- Average the heatmap over a the last x number of heatmaps -> I have used 10
+- Determine boxes for the final heatmap
 
+Below are some examples of the intermediate steps.
 
-![alt text][image4]
+### The output of HOG predictions
+![alt text][image4a]
+![alt text][image4b]
+![alt text][image4c]
+
+### The resulting heatmpa
+![alt text][image5]
+
+### The final prediction
+![alt text][image6]
 ---
+
+### Speed improvement
+
+I have tried to improve the speed by calculating the HOG features only ones and aggregating them per window. This did not result in a speedimprovement, so I did not use this.
+The code can be found in `find_car_fast.py`
 
 ### Video Implementation
 
-#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+#### Final video
+Here's a [link to my video result](./test_video_output/project_video.mp4)
 
+#### 2. Remove false positives
 
-#### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
+I did the following to remove false positives from the video:
+- Thresholding the heatmap: remove pixel below a certain count (5)
+- Average the heatmap over a number of frames: 10
+- Adjusting the window the search for (y between 400 and 650)
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
-
-Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
-
-### Here are six frames and their corresponding heatmaps:
-
-![alt text][image5]
-
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
-
-### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
-
-
-
----
-
-### Discussion
-
-#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
 
