@@ -25,7 +25,7 @@ The goals / steps of this project are the following:
 
 ---
 
-[![Project video output](https://img.youtube.com/vi/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=qT1a65P5MH4)
+[![Project video output](https://img.youtube.com/vi/GqfAw6khKjA/0.jpg)](https://www.youtube.com/watch?v=GqfAw6khKjA )
 
 ---
 ### Writeup / README
@@ -111,6 +111,8 @@ Or click on the YouTube video below to see the pipeline with the intermediate st
 I have tried to improve the speed by calculating the HOG features only ones and aggregating them per window. This did not result in a speedimprovement, so I did not use this.
 The code can be found in `find_car_fast.py`
 
+Especially sliding through the windows, takes a lot of time. I couldn't get it below it 4 seconds per iterations on a 2.6 GHz Intel Core 7, so I think this method is not suitable for analysing a video stream realtime.
+
 ### Video Implementation
 
 #### Final video
@@ -118,7 +120,7 @@ Here's a [link to my video result](./test_video_output/project_video.mp4)
 
 Or click on the YouTube video below:
 
-[![Project video output](https://img.youtube.com/vi/qT1a65P5MH4/0.jpg)](https://www.youtube.com/watch?v=qT1a65P5MH4)
+[![Project video output](https://img.youtube.com/vi/GqfAw6khKjA/0.jpg)](https://www.youtube.com/watch?v=GqfAw6khKjA )
 
 #### Remove false positives
 
