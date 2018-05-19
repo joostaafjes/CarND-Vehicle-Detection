@@ -116,7 +116,7 @@ Especially sliding through the windows, takes a lot of time. I couldn't get it b
 ### Video Implementation
 
 #### Final video
-Here's a [link to my video result](./test_video_output/project_video.mp4)
+Here's a [link to my video result](./test_videos_output/project_video.mp4)
 
 Or click on the YouTube video below:
 
